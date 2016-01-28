@@ -1,0 +1,11 @@
+/**
+ *
+ * Mixins to generate elements
+ *
+ */
+
+@mixin patriarch($width, $color){
+	width: ($width);
+	background-color: rgba($color, 0.75);
+	border: 1px solid $color;
+}
