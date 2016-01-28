@@ -27,7 +27,7 @@ export default class Person extends React.Component {
         <Tooltip show={person.displayTooltip}>
           <p>{person.name.toUpperCase()}</p>
           <p>Was born {person.birth} years after Creation</p>
-          <p>Lived {person.age}</p>
+          <p>Lived {person.age} years</p>
         </Tooltip>
         
       </div>
