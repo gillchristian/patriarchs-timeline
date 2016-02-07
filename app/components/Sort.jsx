@@ -8,7 +8,9 @@ export default class Sort extends React.Component {
   }
 	
   render() {
+    console.log()
+    let icon = 'glyphicon glyphicon-arrow-' + (this.props.sort ? 'up': 'down' );
     return (
-			<button className='btn btn-success' onClick={this._onClickSortByAge}>Sort by Age</button> );
+			<button className='btn btn-success' onClick={this._onClickSortByAge}>Sort by Age <span className={icon}></span></button> );
   }
 }

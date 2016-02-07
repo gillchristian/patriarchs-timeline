@@ -15,8 +15,7 @@ var ActionTypes = keyMirror({
   PERSONS_COMPARE: null,
   PERSONS_RESET: null,
   PERSONS_ORDER_BY_AGE: null,
-  PERSONS_SHOW_TOOLTIP: null,
-  PERSONS_HIDE_TOOLTIP: null,
+  PERSONS_SWITCH_TOOLTIP: null
 });
 
 export default ActionTypes;

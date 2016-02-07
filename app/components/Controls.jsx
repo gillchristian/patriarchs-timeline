@@ -9,7 +9,7 @@ export default class Controls extends React.Component {
     return (
       <div className='controls'>
         <Compare />
-        <Sort />
+        <Sort sort={this.props.sort}/>
         <Reset />
       </div>
     );

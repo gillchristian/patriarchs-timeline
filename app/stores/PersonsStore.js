@@ -3,55 +3,82 @@ import AppDispatcherSingleton from '../dispatcher/AppDispatcher';
 import ActionTypes from '../constants/AppConstants';
 import personsState from '../data/PersonsData';
 
-let appState = personsState.initialState;
+let appState = personsState;
 
-function compareArrayByAge(a, b){
+/**
+ * Sorting function
+ * Compares by the object age property
+ */
+function compareByAgeAsc(a, b){
   if (a.age < b.age)
     return -1;
-  else if (a.age > b.age)
+  if (a.age > b.age)
     return 1;
-    else return 0
+  return 0
 }
 
+/**
+ * Sorting function
+ * Compares by the object age property
+ */
+function compareByAgeDesc(a, b){
+  if (a.age > b.age)
+    return -1;
+  if (a.age < b.age)
+    return 1;
+  return 0
+}
+
+/**
+ * Sorting function
+ * Compares by the object id property
+ */
 function compareArrayById(a, b){
   if (a.id < b.id)
     return -1;
-  else if (a.id > b.id)
+  if (a.id > b.id)
     return 1;
-    else return 0
+  return 0
 }
 
+/**
+ * Sorts persons by age
+ */
 function sortByAge(){
-  appState = {};  
-  appState = personsState.comparedState;
-  appState.persons.sort(compareArrayByAge);
+  appState.persons = appState.persons.map( value => Object.assign({}, value, {margin: 0}) );
+  let sortCallback = appState.compareAgeAscending ? compareByAgeAsc : compareByAgeDesc;
+  appState.persons.sort(sortCallback);
+  appState.compareAgeAscending = !appState.compareAgeAscending;
 }
 
+/**
+ * Compares all persons
+ * by setting the margin (reprecents the birth) at 0
+ * 
+ */
 function compareAll() {
-  appState = {};
-  appState = personsState.comparedState;
+  appState.persons = appState.persons.map( value => Object.assign({}, value, {margin: 0}) );
   appState.persons.sort(compareArrayById);
 }
 
+/**
+ * Resets the margins to the initial value
+ */
 function resetMargins() {
-  appState = {};
-  appState = personsState.initialState;
+  appState.persons = appState.persons.map( value => Object.assign({}, value, {margin: value.birth}) )
+  appState.persons.sort(compareArrayById);
 }
 
-function showTooltip(id){
-  appState.persons.map((value)=>{
+/**
+ * Displayes / hides the tooltip for a person
+ * 
+ * @param {int} id
+ */
+function tooltipState(id){
+  for (let value of appState.persons)
     if (value.id === id)
-      value.displayTooltip = true;
-  })
+      value.displayTooltip = !value.displayTooltip;
 }
-
-function hideTooltip(id){
-  appState.persons.map((value)=>{
-    if (value.id === id)
-      value.displayTooltip = false;
-  })
-}
-
 
 class PersonsStore extends Store {
 
@@ -97,21 +124,11 @@ PersonsStoreSingleton.dispatchToken = AppDispatcherSingleton.register(action => 
     /**
      * Show tooltip related to a patriarch 
      */
-    case ActionTypes.PERSONS_SHOW_TOOLTIP:
-      showTooltip(action.id);
+    case ActionTypes.PERSONS_SWITCH_TOOLTIP:
+      tooltipState(action.id);
       PersonsStoreSingleton.emitChange();
       break;
-
-    /**
-     * Show tooltip related to a patriarch 
-     */
-    case ActionTypes.PERSONS_HIDE_TOOLTIP:
-      hideTooltip(action.id);
-      PersonsStoreSingleton.emitChange();
-      break;
-
-
-
+      
     default:
       // no default action    
   }

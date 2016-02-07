@@ -45,7 +45,7 @@ export default class PeopleChart extends React.Component {
   render() {
     return (
       <div className='peopleChart'>
-				<Controls />
+				<Controls sort={this.state.compareAgeAscending} />
         { this.personsList() }
       </div>
     );

@@ -5,11 +5,11 @@ import AppActions from '../actions/AppActions.js';
 export default class Person extends React.Component {
   
   _onMouseLeave(){
-    AppActions.hideTooltip(this.props.person.id);
+    AppActions.switchTooltip(this.props.person.id);
   }
   
   _onMouseEnter(){
-    AppActions.showTooltip(this.props.person.id);
+    AppActions.switchTooltip(this.props.person.id);
   }
 	
   render() {

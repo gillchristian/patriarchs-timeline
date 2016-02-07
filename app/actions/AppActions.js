@@ -46,26 +46,12 @@ var AppActions = {
    * 
    * @param {int} id  patriarch id
    */
-  showTooltip: (id) => {
+  switchTooltip: (id) => {
     AppDispatcherSingleton.dispatch({
-      type: ActionTypes.PERSONS_SHOW_TOOLTIP,
-      id: id
-    });
-  },
-
-
-  /**
-   * Hide tooltip for not-hovered patriarch.
-   * 
-   * @param {int} id  patriarch id
-   */
-  hideTooltip: (id) => {
-    AppDispatcherSingleton.dispatch({
-      type: ActionTypes.PERSONS_HIDE_TOOLTIP,
+      type: ActionTypes.PERSONS_SWITCH_TOOLTIP,
       id: id
     });
   }
-
 };
 
 export default AppActions;
