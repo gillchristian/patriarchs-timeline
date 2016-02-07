@@ -20160,7 +20160,7 @@
 				return _react2.default.createElement(
 					'div',
 					{ className: 'peopleChart' },
-					_react2.default.createElement(_Controls2.default, null),
+					_react2.default.createElement(_Controls2.default, { sort: this.state.compareAgeAscending }),
 					this.personsList()
 				);
 			}
@@ -20216,12 +20216,12 @@
 	  _createClass(Person, [{
 	    key: '_onMouseLeave',
 	    value: function _onMouseLeave() {
-	      _AppActions2.default.hideTooltip(this.props.person.id);
+	      _AppActions2.default.switchTooltip(this.props.person.id);
 	    }
 	  }, {
 	    key: '_onMouseEnter',
 	    value: function _onMouseEnter() {
-	      _AppActions2.default.showTooltip(this.props.person.id);
+	      _AppActions2.default.switchTooltip(this.props.person.id);
 	    }
 	  }, {
 	    key: 'render',
@@ -20390,25 +20390,12 @@
 	   * 
 	   * @param {int} id  patriarch id
 	   */
-	  showTooltip: function showTooltip(id) {
+	  switchTooltip: function switchTooltip(id) {
 	    _AppDispatcher2.default.dispatch({
-	      type: _AppConstants2.default.PERSONS_SHOW_TOOLTIP,
-	      id: id
-	    });
-	  },
-
-	  /**
-	   * Hide tooltip for not-hovered patriarch.
-	   * 
-	   * @param {int} id  patriarch id
-	   */
-	  hideTooltip: function hideTooltip(id) {
-	    _AppDispatcher2.default.dispatch({
-	      type: _AppConstants2.default.PERSONS_HIDE_TOOLTIP,
+	      type: _AppConstants2.default.PERSONS_SWITCH_TOOLTIP,
 	      id: id
 	    });
 	  }
-
 	};
 
 	exports.default = AppActions;
@@ -21535,8 +21522,7 @@
 	  PERSONS_COMPARE: null,
 	  PERSONS_RESET: null,
 	  PERSONS_ORDER_BY_AGE: null,
-	  PERSONS_SHOW_TOOLTIP: null,
-	  PERSONS_HIDE_TOOLTIP: null
+	  PERSONS_SWITCH_TOOLTIP: null
 	}); /*
 	     * Copyright (c) 2014-2015, Facebook, Inc.
 	     * All rights reserved.
@@ -21662,7 +21648,7 @@
 	        'div',
 	        { className: 'controls' },
 	        _react2.default.createElement(_Compare2.default, null),
-	        _react2.default.createElement(_Sort2.default, null),
+	        _react2.default.createElement(_Sort2.default, { sort: this.props.sort }),
 	        _react2.default.createElement(_Reset2.default, null)
 	      );
 	    }
@@ -21778,10 +21764,13 @@
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      console.log();
+	      var icon = 'glyphicon glyphicon-arrow-' + (this.props.sort ? 'up' : 'down');
 	      return _react2.default.createElement(
 	        'button',
 	        { className: 'btn btn-success', onClick: this._onClickSortByAge },
-	        'Sort by Age'
+	        'Sort by Age ',
+	        _react2.default.createElement('span', { className: icon })
 	      );
 	    }
 	  }]);
@@ -21886,43 +21875,102 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var appState = _PersonsData2.default.initialState;
+	var appState = _PersonsData2.default;
 
-	function compareArrayByAge(a, b) {
-	  if (a.age < b.age) return -1;else if (a.age > b.age) return 1;else return 0;
+	/**
+	 * Sorting function
+	 * Compares by the object age property
+	 */
+	function compareByAgeAsc(a, b) {
+	  if (a.age < b.age) return -1;
+	  if (a.age > b.age) return 1;
+	  return 0;
 	}
 
+	/**
+	 * Sorting function
+	 * Compares by the object age property
+	 */
+	function compareByAgeDesc(a, b) {
+	  if (a.age > b.age) return -1;
+	  if (a.age < b.age) return 1;
+	  return 0;
+	}
+
+	/**
+	 * Sorting function
+	 * Compares by the object id property
+	 */
 	function compareArrayById(a, b) {
-	  if (a.id < b.id) return -1;else if (a.id > b.id) return 1;else return 0;
+	  if (a.id < b.id) return -1;
+	  if (a.id > b.id) return 1;
+	  return 0;
 	}
 
+	/**
+	 * Sorts persons by age
+	 */
 	function sortByAge() {
-	  appState = {};
-	  appState = _PersonsData2.default.comparedState;
-	  appState.persons.sort(compareArrayByAge);
+	  appState.persons = appState.persons.map(function (value) {
+	    return Object.assign({}, value, { margin: 0 });
+	  });
+	  var sortCallback = appState.compareAgeAscending ? compareByAgeAsc : compareByAgeDesc;
+	  appState.persons.sort(sortCallback);
+	  appState.compareAgeAscending = !appState.compareAgeAscending;
 	}
 
+	/**
+	 * Compares all persons
+	 * by setting the margin (reprecents the birth) at 0
+	 * 
+	 */
 	function compareAll() {
-	  appState = {};
-	  appState = _PersonsData2.default.comparedState;
+	  appState.persons = appState.persons.map(function (value) {
+	    return Object.assign({}, value, { margin: 0 });
+	  });
 	  appState.persons.sort(compareArrayById);
 	}
 
+	/**
+	 * Resets the margins to the initial value
+	 */
 	function resetMargins() {
-	  appState = {};
-	  appState = _PersonsData2.default.initialState;
+	  appState.persons = appState.persons.map(function (value) {
+	    return Object.assign({}, value, { margin: value.birth });
+	  });
+	  appState.persons.sort(compareArrayById);
 	}
 
-	function showTooltip(id) {
-	  appState.persons.map(function (value) {
-	    if (value.id === id) value.displayTooltip = true;
-	  });
-	}
+	/**
+	 * Displayes / hides the tooltip for a person
+	 * 
+	 * @param {int} id
+	 */
+	function tooltipState(id) {
+	  var _iteratorNormalCompletion = true;
+	  var _didIteratorError = false;
+	  var _iteratorError = undefined;
 
-	function hideTooltip(id) {
-	  appState.persons.map(function (value) {
-	    if (value.id === id) value.displayTooltip = false;
-	  });
+	  try {
+	    for (var _iterator = appState.persons[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      var value = _step.value;
+
+	      if (value.id === id) value.displayTooltip = !value.displayTooltip;
+	    }
+	  } catch (err) {
+	    _didIteratorError = true;
+	    _iteratorError = err;
+	  } finally {
+	    try {
+	      if (!_iteratorNormalCompletion && _iterator.return) {
+	        _iterator.return();
+	      }
+	    } finally {
+	      if (_didIteratorError) {
+	        throw _iteratorError;
+	      }
+	    }
+	  }
 	}
 
 	var PersonsStore = function (_Store) {
@@ -21977,16 +22025,8 @@
 	    /**
 	     * Show tooltip related to a patriarch 
 	     */
-	    case _AppConstants2.default.PERSONS_SHOW_TOOLTIP:
-	      showTooltip(action.id);
-	      PersonsStoreSingleton.emitChange();
-	      break;
-
-	    /**
-	     * Show tooltip related to a patriarch 
-	     */
-	    case _AppConstants2.default.PERSONS_HIDE_TOOLTIP:
-	      hideTooltip(action.id);
+	    case _AppConstants2.default.PERSONS_SWITCH_TOOLTIP:
+	      tooltipState(action.id);
 	      PersonsStoreSingleton.emitChange();
 	      break;
 
@@ -22369,15 +22409,10 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var initialState = {
-	  persons: [{ id: 0, name: 'adan', birth: 0, margin: 0, age: 930, displayTooltip: false }, { id: 1, name: 'set', birth: 130, margin: 130, age: 912, displayTooltip: false }, { id: 2, name: 'enos', birth: 235, margin: 235, age: 905, displayTooltip: false }, { id: 3, name: 'cainan', birth: 325, margin: 325, age: 910, displayTooltip: false }, { id: 4, name: 'malalel', birth: 395, margin: 395, age: 895, displayTooltip: false }, { id: 5, name: 'jared', birth: 460, margin: 460, age: 962, displayTooltip: false }, { id: 6, name: 'enoc', birth: 522, margin: 522, age: 365, displayTooltip: false }, { id: 7, name: 'matusalen', birth: 587, margin: 587, age: 969, displayTooltip: false }, { id: 8, name: 'lamec', birth: 774, margin: 774, age: 777, displayTooltip: false }, { id: 9, name: 'noe', birth: 956, margin: 956, age: 950, displayTooltip: false }, { id: 10, name: 'sem', birth: 1456, margin: 1456, age: 600, displayTooltip: false }, { id: 11, name: 'arfaxad', birth: 1556, margin: 1556, age: 438, displayTooltip: false }, { id: 12, name: 'sala', birth: 1591, margin: 1591, age: 433, displayTooltip: false }, { id: 13, name: 'haber', birth: 1621, margin: 1621, age: 464, displayTooltip: false }, { id: 14, name: 'peleg', birth: 1655, margin: 1655, age: 239, displayTooltip: false }, { id: 15, name: 'reu', birth: 1685, margin: 1685, age: 239, displayTooltip: false }, { id: 16, name: 'serug', birth: 1717, margin: 1717, age: 237, displayTooltip: false }, { id: 17, name: 'nacor', birth: 1746, margin: 1746, age: 138, displayTooltip: false }, { id: 18, name: 'tare', birth: 1777, margin: 1777, age: 205, displayTooltip: false }]
+	var personsStates = {
+	  persons: [{ id: 0, name: 'adan', birth: 0, margin: 0, age: 930, displayTooltip: false }, { id: 1, name: 'set', birth: 130, margin: 130, age: 912, displayTooltip: false }, { id: 2, name: 'enos', birth: 235, margin: 235, age: 905, displayTooltip: false }, { id: 3, name: 'cainan', birth: 325, margin: 325, age: 910, displayTooltip: false }, { id: 4, name: 'malalel', birth: 395, margin: 395, age: 895, displayTooltip: false }, { id: 5, name: 'jared', birth: 460, margin: 460, age: 962, displayTooltip: false }, { id: 6, name: 'enoc', birth: 522, margin: 522, age: 365, displayTooltip: false }, { id: 7, name: 'matusalen', birth: 587, margin: 587, age: 969, displayTooltip: false }, { id: 8, name: 'lamec', birth: 774, margin: 774, age: 777, displayTooltip: false }, { id: 9, name: 'noe', birth: 956, margin: 956, age: 950, displayTooltip: false }, { id: 10, name: 'sem', birth: 1456, margin: 1456, age: 600, displayTooltip: false }, { id: 11, name: 'arfaxad', birth: 1556, margin: 1556, age: 438, displayTooltip: false }, { id: 12, name: 'sala', birth: 1591, margin: 1591, age: 433, displayTooltip: false }, { id: 13, name: 'haber', birth: 1621, margin: 1621, age: 464, displayTooltip: false }, { id: 14, name: 'peleg', birth: 1655, margin: 1655, age: 239, displayTooltip: false }, { id: 15, name: 'reu', birth: 1685, margin: 1685, age: 239, displayTooltip: false }, { id: 16, name: 'serug', birth: 1717, margin: 1717, age: 237, displayTooltip: false }, { id: 17, name: 'nacor', birth: 1746, margin: 1746, age: 138, displayTooltip: false }, { id: 18, name: 'tare', birth: 1777, margin: 1777, age: 205, displayTooltip: false }],
+	  compareAgeAscending: true
 	};
-
-	var comparedState = {
-	  persons: [{ id: 0, name: 'adan', birth: 0, margin: 0, age: 930, displayTooltip: false }, { id: 1, name: 'set', birth: 130, margin: 0, age: 912, displayTooltip: false }, { id: 2, name: 'enos', birth: 235, margin: 0, age: 905, displayTooltip: false }, { id: 3, name: 'cainan', birth: 325, margin: 0, age: 910, displayTooltip: false }, { id: 4, name: 'malalel', birth: 395, margin: 0, age: 895, displayTooltip: false }, { id: 5, name: 'jared', birth: 460, margin: 0, age: 962, displayTooltip: false }, { id: 6, name: 'enoc', birth: 522, margin: 0, age: 365, displayTooltip: false }, { id: 7, name: 'matusalen', birth: 587, margin: 0, age: 969, displayTooltip: false }, { id: 8, name: 'lamec', birth: 774, margin: 0, age: 777, displayTooltip: false }, { id: 9, name: 'noe', birth: 956, margin: 0, age: 950, displayTooltip: false }, { id: 10, name: 'sem', birth: 1456, margin: 0, age: 600, displayTooltip: false }, { id: 11, name: 'arfaxad', birth: 1556, margin: 0, age: 438, displayTooltip: false }, { id: 12, name: 'sala', birth: 1591, margin: 0, age: 433, displayTooltip: false }, { id: 13, name: 'haber', birth: 1621, margin: 0, age: 464, displayTooltip: false }, { id: 14, name: 'peleg', birth: 1655, margin: 0, age: 239, displayTooltip: false }, { id: 15, name: 'reu', birth: 1685, margin: 0, age: 239, displayTooltip: false }, { id: 16, name: 'serug', birth: 1717, margin: 0, age: 237, displayTooltip: false }, { id: 17, name: 'nacor', birth: 1746, margin: 0, age: 138, displayTooltip: false }, { id: 18, name: 'tare', birth: 1777, margin: 0, age: 205, displayTooltip: false }]
-	};
-
-	var personsStates = { comparedState: comparedState, initialState: initialState };
 
 	exports.default = personsStates;
 
