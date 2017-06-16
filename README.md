@@ -1,4 +1,4 @@
-#patriarchs timeline
+# patriarchs timeline
 
 this is a simple app I made to learn the basic principles of React + Flux architecture. Also I started to use ES6, JSX, Webpack and Babel.
 
